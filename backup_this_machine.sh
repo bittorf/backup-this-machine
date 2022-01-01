@@ -12,6 +12,9 @@ USERNAME="$( whoami )"
 COMPUTERNAME="$USERNAME-$( hostname || cat /etc/hostname )"	# e.g. bob-laptop
 HOME="$( eval echo ~"$USERNAME" )"
 
+# avoid double username:
+case "$COMPUTERNAME" in "$USERNAME-"*) COMPUTERNAME="${COMPUTERNAME#*-}" ;; esac
+
 # also for overriding any of the vars above:
 CONFIG="$HOME/.backup_this_machine.config"
 

@@ -11,6 +11,7 @@ ARG2="$2"
 USERNAME="$( whoami )"
 COMPUTERNAME="$USERNAME-$( hostname || cat /etc/hostname )"	# e.g. bob-laptop
 HOME="$( eval echo ~"$USERNAME" )"
+ME="$( realpath "$0" || echo "$0" )"
 
 # avoid double username:
 case "$COMPUTERNAME" in "$USERNAME-"*) COMPUTERNAME="${COMPUTERNAME#*-}" ;; esac
@@ -29,7 +30,7 @@ test -s "$CONFIG" && log "[OK] loading settings from '$CONFIG'" && . "$CONFIG"
 usage_show()
 {
 	cat <<EOF
-Usage: $0 <full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|restic-restore>
+Usage: $0 <full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|restic-restore|update>
 
  e.g.: $0 full
        $0 restic
@@ -37,6 +38,9 @@ Usage: $0 <full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|res
        $0 restic-snapshots-list
        $0 restic-mount
        $0 restic-restore
+       $0 update
+
+  see: https://github.com/bittorf/backup-this-machine
 
 configured vars (defaults or from file '$CONFIG'):
  # USERNAME	=> $USERNAME
@@ -74,7 +78,7 @@ check_essentials()
 
 # uncomment this for storing ssh-keys, passwords and network-configs
 # for cronjobs add to '/etc/sudoers.d/$( basename "$0" '.sh' )' this line:"
-#    $USER ALL = (root) NOPASSWD: $( realpath "$0" )"
+#    $USER ALL = (root) NOPASSWD: $ME"
 #SUDO=true
 
 # values are in [kilobits/sec]
@@ -121,6 +125,17 @@ case "$ACTION" in
 		check_essentials || exit 1
 	;;
 	add_secrets)
+	;;
+	update)
+		BASE='https://raw.githubusercontent.com/bittorf'
+		URL="$BASE/backup-this-machine/main/backup_this_machine.sh"
+		DESTINATION="$ME"
+
+		log "[OK] sudo: download from '$URL'"
+		log "           installing to '$DESTINATION'"
+		sudo wget -O  "$DESTINATION" "$URL" || exit $?
+		sudo chmod +x "$DESTINATION"
+		exit $?
 	;;
 	*)
 		usage_show && exit 1
@@ -171,7 +186,7 @@ prepare_usrlocalbin()
 
 	if rootuser_allowed; then
 		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" )' this line:"
-		log "       $USER ALL = (root) NOPASSWD: $( realpath "$0" )"
+		log "       $USER ALL = (root) NOPASSWD: $ME"
 		log
 		log "[sudo] will execute: sudo $0 add_secrets '$dir'"
 		sudo "$0" add_secrets "$dir" || exit 1
@@ -181,7 +196,7 @@ prepare_usrlocalbin()
 		log "       e.g. SUDO=true $0 $ACTION $ARG2"
 		log
 		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" )' this line:"
-		log "       $USER ALL = (root) NOPASSWD: $( realpath "$0" )"
+		log "       $USER ALL = (root) NOPASSWD: $ME"
 	fi
 
 	log

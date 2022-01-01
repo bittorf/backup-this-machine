@@ -121,7 +121,12 @@ EOF
 OPT="$( for DIR in $EXCLUDE $HOME/.cache; do printf '%s ' "--exclude $DIR"; done ) --exclude-caches"
 
 case "$ACTION" in
-	full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|restic-restore)
+	restic-restore)
+	;;
+	full|restic|restic-and-suspend|restic-snapshots-list|restic-mount)
+		check_essentials || exit 1
+	;;
+	help)
 		check_essentials || exit 1
 	;;
 	add_secrets)
@@ -131,8 +136,9 @@ case "$ACTION" in
 		URL="$BASE/backup-this-machine/main/backup_this_machine.sh"
 		DESTINATION="$ME"
 
-		log "[OK] sudo: download from '$URL'"
-		log "           installing to '$DESTINATION'"
+		log "[OK] sudo: download + install"
+		log "     from '$URL'"
+		log "     to '$DESTINATION'"
 		sudo wget -qO "$DESTINATION" "$URL" || exit $?
 		sudo chmod +x "$DESTINATION" && log "[OK] updated"
 		exit $?
@@ -268,6 +274,7 @@ case "$ACTION" in
 				exit $?
 			;;
 			'restic-restore')
+				# TODO: crontab + ssh + password
 				# shellcheck disable=SC2086
 				RESTIC_PASSWORD=$PASS restic -r "$REPO" restore latest --target /
 				exit $?

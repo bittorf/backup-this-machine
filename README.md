@@ -15,9 +15,10 @@ It needs a working [restic](https://restic.net/) installation:
 ```
 $ sudo apt-get install restic
 ```
-Get some help, how to setup config file:
+Get some help, e.g. how to setup config file or usage:
 ```
 $ backup_this_machine.sh help
+$ backup_this_machine.sh
 ```
 ### backup
 ```
@@ -27,7 +28,7 @@ $ backup_this_machine.sh restic-and-suspend
 ```
 ### restore
 ```
-$ export PASS=...
+$ export PASS="your secret password"
 $ export SERVER="sftp://user@your.host.name:443"
 $ export DESTINATION="/path/to/restic-dir/on/server"
 

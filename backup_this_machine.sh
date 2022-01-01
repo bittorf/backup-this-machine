@@ -127,7 +127,11 @@ case "$ACTION" in
 		check_essentials || exit 1
 	;;
 	help)
-		check_essentials || exit 1
+		check_essentials
+		log "### start"
+		cat "$CONFIG"
+		log "### end of file '$CONFIG'"
+		exit
 	;;
 	add_secrets)
 	;;

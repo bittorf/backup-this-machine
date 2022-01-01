@@ -133,8 +133,8 @@ case "$ACTION" in
 
 		log "[OK] sudo: download from '$URL'"
 		log "           installing to '$DESTINATION'"
-		sudo wget -O  "$DESTINATION" "$URL" || exit $?
-		sudo chmod +x "$DESTINATION"
+		sudo wget -qO "$DESTINATION" "$URL" || exit $?
+		sudo chmod +x "$DESTINATION" && log "[OK] updated"
 		exit $?
 	;;
 	*)

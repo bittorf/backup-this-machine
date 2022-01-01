@@ -196,7 +196,7 @@ prepare_usrlocalbin()
 		crontab -l >"$dir/crontab.txt"
 
 	if rootuser_allowed; then
-		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" )' this line:"
+		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" '.sh' )' this line:"
 		log "       $USER ALL = (root) NOPASSWD: $ME"
 		log
 		log "[sudo] will execute: sudo $0 add_secrets '$dir'"
@@ -206,7 +206,7 @@ prepare_usrlocalbin()
 		log "[HINT] run with SUDO=true for storing ssh-keys, passwords and network-configs"
 		log "       e.g. SUDO=true $0 $ACTION $ARG2"
 		log
-		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" )' this line:"
+		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" '.sh' )' this line:"
 		log "       $USER ALL = (root) NOPASSWD: $ME"
 	fi
 

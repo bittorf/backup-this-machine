@@ -14,7 +14,7 @@ HOME="$( eval echo ~"$USERNAME" )"
 ME="$( realpath "$0" || echo "$0" )"
 
 # avoid double username:
-case "$COMPUTERNAME" in "$USERNAME-"*) COMPUTERNAME="${COMPUTERNAME#*-}" ;; esac
+case "$COMPUTERNAME" in "$USERNAME-$USERNAME-"*) COMPUTERNAME="${COMPUTERNAME#*-}" ;; esac
 
 # also for overriding any of the vars above:
 CONFIG="$HOME/.backup_this_machine.config"

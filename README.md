@@ -1,5 +1,4 @@
-### setup
-Download script and make it executable:
+### initial setup
 ```
 $ BASE='https://raw.githubusercontent.com/bittorf'
 $ URL="$BASE/backup-this-machine/main/backup_this_machine.sh"
@@ -20,22 +19,20 @@ Get some help, how to setup config file:
 ```
 $ backup_this_machine.sh help
 ```
-
 ### backup
 ```
 $ backup_this_machine.sh restic
 # or:
 $ backup_this_machine.sh restic-and-suspend
 ```
-
-## restore
+### restore
 ```
 $ export PASS=...
 $ export SERVER="sftp://user@your.host.name:443"
 $ export DESTINATION="/path/to/restic-dir/on/server"
+
 $ backup_this_machine.sh restic-restore
 ```
-
 ### timemachine: walk through your old stuff
 ```
 $ backup_this_machine.sh restic-mount

@@ -4,6 +4,7 @@
 # e.g. run rootjob with
 # list_users() { grep "/bin/bash"$ /etc/passwd | cut -d':' -f1; }
 # for U in $(list_users); do sudo -u $U backup_this_machine.sh restic; done
+{
 
 ACTION="$1"
 ARG2="$2"
@@ -334,3 +335,5 @@ D2=$(( S2 - S1 ))
 # tgz + verbose = 23/9743 -> 68gig
 # tar + quiet   = 29/7553 -> 81gig
 log "OK - needed: $D1/$D2 seconds, returncodes: $R1/$R2"
+
+}

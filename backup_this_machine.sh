@@ -30,16 +30,18 @@ test -s "$CONFIG" && log "[OK] loading settings from '$CONFIG'" && . "$CONFIG"
 
 usage_show()
 {
-	cat <<EOF
-Usage: $0 <full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|restic-restore|update>
+	local me="$( basename "$ME" )"
 
- e.g.: $0 full
-       $0 restic
-       $0 restic-and-suspend
-       $0 restic-snapshots-list
-       $0 restic-mount
-       $0 restic-restore
-       $0 update
+	cat <<EOF
+Usage: $me <full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|restic-restore|update>
+
+ e.g.: $me full
+       $me restic
+       $me restic-and-suspend
+       $me restic-snapshots-list
+       $me restic-mount
+       $me restic-restore
+       $me update
 
   see: https://github.com/bittorf/backup-this-machine
 
@@ -53,6 +55,7 @@ configured vars (defaults or from file '$CONFIG'):
  # DESTINATION	=> $DESTINATION
  # SERVER	=> $SERVER
  # PASS		=> $PASS
+
 EOF
 }
 

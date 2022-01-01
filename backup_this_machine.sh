@@ -73,6 +73,8 @@ check_essentials()
 #EXCLUDE="\$EXCLUDE \$HOME/ssd \$HOME/.steam \$HOME/kannweg \$HOME/Downloads"
 
 # uncomment this for storing ssh-keys, passwords and network-configs
+# for cronjobs add to '/etc/sudoers.d/$( basename "$0" '.sh' )' this line:"
+#    $USER ALL = (root) NOPASSWD: $( realpath "$0" )"
 #SUDO=true
 
 # values are in [kilobits/sec]
@@ -161,8 +163,11 @@ prepare_usrlocalbin()
 	fi
 
 	cp -p -R /usr/local/bin/                   "$dir"
+
 	[ -f /etc/rc.local ] && cat /etc/rc.local >"$dir/etc-rc.local"
-	crontab -l >/dev/null && crontab -l       >"$dir/crontab.txt"
+
+	crontab -l 2>/dev/null >/dev/null && \
+		crontab -l >"$dir/crontab.txt"
 
 	if rootuser_allowed; then
 		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" )' this line:"
@@ -217,11 +222,11 @@ case "$ACTION" in
 
 		# network and wifi-configs and passwords:
 		[ -d /var/lib/wicd/configurations ] && {
-			tar cf "$DIR/wicd.tar" /var/lib/wicd/configurations
+			tar cf "$DIR/wicd.tar" /var/lib/wicd/configurations 2>/dev/null
 		}
 
 		[ -d /etc/NetworkManager ] && {
-			tar cf "$DIR/networkmanager.tar" /etc/NetworkManager
+			tar cf "$DIR/networkmanager.tar" /etc/NetworkManager 2>/dev/null
 		}
 
 		chown -R "$USER_AND_GROUP" "$DIR"

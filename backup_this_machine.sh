@@ -9,6 +9,13 @@
 ACTION="$1"
 ARG2="$2"
 
+case "$ACTION" in
+	restic-cronmode)
+		read -r LOAD REST </proc/loadavg
+		case "$LOAD" in 0.*) ;; *) exit 0 ;; esac
+	;;
+esac
+
 USERNAME="$( whoami )"
 COMPUTERNAME="$USERNAME-$( hostname || cat /etc/hostname )"	# e.g. bob-laptop
 HOME="$( eval echo ~"$USERNAME" )"
@@ -30,10 +37,10 @@ test -s "$CONFIG" && log "[OK] loading settings from '$CONFIG'" && . "$CONFIG"
 
 usage_show()
 {
-	local me="$( basename "$ME" )"
+	local me && me="$( basename "$ME" )"
 
 	cat <<EOF
-Usage: $me <full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|restic-restore|update>
+Usage: $me <full|restic|restic-and-suspend|restic-cronmode|restic-snapshots-list|restic-mount|restic-restore|update>
 
  e.g.: $me full
        $me restic
@@ -122,9 +129,19 @@ EOF
 	}
 }
 
-OPT="$( for DIR in $EXCLUDE $HOME/.cache; do printf '%s ' "--exclude $DIR"; done ) --exclude-caches"
-
 case "$ACTION" in
+	restic-cronmode)
+		UNIXTIME="$( date +%s )"
+		UNIXFILE="$( date +%s -r "$CONFIG" )"
+		FILE_AGE=$(( UNIXTIME - UNIXFILE ))
+
+		if test "$FILE_AGE" -lt 86400; then
+			exit 0
+		else
+			touch "$CONFIG"		# mark as 'done' using file timestamp
+			ACTION='restic'
+		fi
+	;;
 	restic-restore)
 	;;
 	full|restic|restic-and-suspend|restic-snapshots-list|restic-mount)
@@ -231,6 +248,8 @@ do_suspend()	# https://askubuntu.com/questions/1792/how-can-i-suspend-hibernate-
 			"/org/freedesktop/UPower" \
 			 "org.freedesktop.UPower.Suspend"
 }
+
+OPT="$( for DIR in $EXCLUDE $HOME/.cache; do printf '%s ' "--exclude $DIR"; done ) --exclude-caches"
 
 case "$ACTION" in
 	'full')

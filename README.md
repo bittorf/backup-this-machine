@@ -34,6 +34,10 @@ $ export DESTINATION="/path/to/restic-dir/on/server"
 
 $ backup_this_machine.sh restic-restore
 ```
+### cronjob
+```
+*/15 * * * * /usr/local/bin/backup_this_machine.sh restic-cronmode
+```
 ### timemachine: walk through your old stuff
 ```
 $ backup_this_machine.sh restic-mount

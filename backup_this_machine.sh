@@ -29,10 +29,16 @@ case "$COMPUTERNAME" in "$USERNAME-$USERNAME-"*) COMPUTERNAME="${COMPUTERNAME#*-
 
 # also for overriding any of the vars above:
 CONFIG="$HOME/.backup_this_machine.config"
+LOCKDIR="$CONFIG.lock"
 
 log()
 {
 	>&2 printf '%s\n' "$1"
+}
+
+lock()
+{
+	mkdir "$LOCKDIR" 2>/dev/null || return 1	# autounlocked in cleanup()
 }
 
 # shellcheck disable=SC1090
@@ -135,13 +141,12 @@ EOF
 case "$ACTION" in
 	restic-cronmode)
 		UNIXTIME="$( date +%s )"
-		UNIXFILE="$( date +%s -r "$CONFIG" )"
+		UNIXFILE="$( date +%s -r "$CONFIG" )"	# touched after successful backup
 		FILE_AGE=$(( UNIXTIME - UNIXFILE ))
 
 		if test "$FILE_AGE" -lt 86400; then
 			exit 0
 		else
-			touch "$CONFIG"		# mark as 'done' using file timestamp
 			ACTION='restic'
 		fi
 	;;
@@ -190,6 +195,8 @@ cleanup()
 {
 	local dir="$1"
 
+	test -d "$LOCKDIR" && rm -fR "$LOCKDIR"
+
 	test -d "$dir" && {
 		rm -fR "$dir"
 		log
@@ -203,7 +210,7 @@ prepare_usrlocalbin()
 
 	log "[OK] creating and filling directory '$dir'"
 
-	if mkdir "$dir"; then
+	if lock && mkdir "$dir"; then
 		# shellcheck disable=SC2064
 		trap "cleanup '$dir'" HUP INT QUIT TERM EXIT
 	else
@@ -314,13 +321,15 @@ case "$ACTION" in
 		prepare_usrlocalbin "$HOME/usr-local-bin"
 
 		# shellcheck disable=SC2086
-		RESTIC_PASSWORD=$PASS restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME" || {
+		if RESTIC_PASSWORD=$PASS restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
+			touch "$CONFIG"		# mark as 'done' using file timestamp
+		else
 			RC=$?
 			log
 			log "[ERROR] restic exited with rc $RC"
 			log "        maybe this is your first time and you must initialize your repository like:"
 			log "        RESTIC_PASSWORD=$PASS restic -r \"$REPO\" init"
-		}
+		fi
 
 		[ "$ACTION" = 'restic-and-suspend' ] && do_suspend
 		exit ${RC:-0}

@@ -11,8 +11,11 @@ ARG2="$2"
 
 case "$ACTION" in
 	restic-cronmode)
-		read -r LOAD REST </proc/loadavg
-		case "$LOAD" in 0.*) ;; *) exit 0 ;; esac
+		# only work if cpu-load is OK, e.g.
+		# 4.xx or lower with 8 cores or 0.xx with 1 core
+		CPU=1; for _ in /sys/devices/system/cpu/cpu[0-9]*; do CPU=$(( CPU + 1 )); done
+		read -r LOAD REST </proc/loadavg && LOAD=${LOAD%.*}
+		test "$LOAD" -le $(( CPU / 2 )) || exit 0
 	;;
 esac
 

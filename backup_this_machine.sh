@@ -49,6 +49,7 @@ usage_show()
 	local me && me="$( basename "$ME" )"
 
 	cat <<EOF
+
 Usage: $me restic
        $me restic-cronmode
        $me restic-and-suspend
@@ -61,7 +62,7 @@ Usage: $me restic
   see: https://github.com/bittorf/backup-this-machine
 
 script-date: $( date -r "$ME" )
-config-date: $( date -r "$CONFIG" && printf '%s' ' (last successful backup)' )
+config-date: $( date -r "$CONFIG" ) (last successful backup)
 
 configured vars (defaults or configfile '$CONFIG'):
  # USERNAME	=> $USERNAME

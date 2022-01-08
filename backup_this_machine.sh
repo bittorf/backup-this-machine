@@ -1,5 +1,5 @@
 #!/bin/sh
-# check: shellcheck --shell=dash /usr/local/bin/backup_this_machine.sh
+# check: shellcheck --shell=dash backup_this_machine.sh
 #
 # e.g. run rootjob with
 # list_users() { grep "/bin/bash"$ /etc/passwd | cut -d':' -f1; }
@@ -60,6 +60,9 @@ Usage: $me <full|restic|restic-and-suspend|restic-cronmode|restic-snapshots-list
        $me update
 
   see: https://github.com/bittorf/backup-this-machine
+
+script-date: $( date -r "$ME" )
+config-date: $( date -r "$CONFIG" && echo ' (last successful backup)' )
 
 configured vars (defaults or from file '$CONFIG'):
  # USERNAME	=> $USERNAME

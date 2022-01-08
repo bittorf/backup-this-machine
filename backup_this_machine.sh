@@ -166,12 +166,12 @@ update()
 	if cmp "$TEMP" "$DESTINATION" >/dev/null; then
 		log "[OK] no change detected"
 	else
-		log "[OK] sudo: download + install"
+		log "[OK] download + install"
 		log "     from '$URL'"
 		log "     to '$DESTINATION'"
 
-		sudo cp  "$TEMP" "$DESTINATION" || exit $?
-		sudo chmod +x    "$DESTINATION" && log "[OK] updated to new version"
+		cp  "$TEMP" "$DESTINATION" || exit $?
+		chmod +x    "$DESTINATION" && log "[OK] updated to new version"
 	fi
 
 	rm -f "$TEMP"
@@ -204,9 +204,13 @@ case "$ACTION" in
 	;;
 	add_secrets)
 	;;
-	update)
+	update_with_sudo)
 		update
-		exit 0
+		exit $?
+	;;
+	update)
+		sudo "$0" update_with_sudo
+		exit $?
 	;;
 	*)
 		usage_show && exit 1

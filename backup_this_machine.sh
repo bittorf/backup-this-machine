@@ -168,13 +168,28 @@ case "$ACTION" in
 		BASE='https://raw.githubusercontent.com/bittorf'
 		URL="$BASE/backup-this-machine/main/backup_this_machine.sh"
 		DESTINATION="$ME"
+		TEMP="$( mktemp )" || exit 1
 
-		log "[OK] sudo: download + install"
-		log "     from '$URL'"
-		log "     to '$DESTINATION'"
-		sudo wget -qO "$DESTINATION" "$URL" || exit $?
-		sudo chmod +x "$DESTINATION" && log "[OK] updated"
-		exit $?
+		log "[OK] checking '$URL'"
+		wget -qO "$TEMP" "$URL" || exit $?
+
+		# some plausibility checks:
+		tail -n1 "$TEMP" | grep -q '}' || exit $?
+		sh -n "$TEMP" || exit $?
+
+		if cmp "$TEMP" "$DESTINATION"; then
+			log "[OK] no change"
+		else
+			log "[OK] sudo: download + install"
+			log "     from '$URL'"
+			log "     to '$DESTINATION'"
+
+			sudo cp  "$TEMP" "$DESTINATION" || exit $?
+			sudo chmod +x    "$DESTINATION" && log "[OK] updated"
+		fi
+
+		rm -f "$TEMP"
+		exit 0
 	;;
 	*)
 		usage_show && exit 1

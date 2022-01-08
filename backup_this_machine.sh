@@ -11,8 +11,8 @@ ARG2="$2"
 
 case "$ACTION" in
 	restic-cronmode)
-		# only work if cpu-load is OK, e.g.
-		# 4.xx or lower with 8 cores or 0.xx with 1 core
+		# only work if cpu-load is OK (max half cpu-cores),
+		# e.g. 4.xx or lower with 8 cores or 0.xx with 1 core
 		CPU=1; for _ in /sys/devices/system/cpu/cpu[0-9]*; do CPU=$(( CPU + 1 )); done
 		read -r LOAD REST </proc/loadavg && LOAD=${LOAD%.*}
 		test "$LOAD" -le $(( CPU / 2 )) || exit 0
@@ -97,8 +97,9 @@ check_essentials()
 #EXCLUDE="\$EXCLUDE \$HOME/ssd \$HOME/.steam \$HOME/kannweg \$HOME/Downloads"
 
 # uncomment this for storing ssh-keys, passwords and network-configs
-# for cronjobs add to '/etc/sudoers.d/$( basename "$0" '.sh' )' this line:"
-#    $USER ALL = (root) NOPASSWD: $ME"
+# for cronjobs add next line to '/etc/sudoers.d/$( basename "$0" '.sh' )'"
+#    $USER ALL = (ALL) NOPASSWD: $ME"
+#
 #SUDO=true
 
 # values are in [kilobits/sec]
@@ -178,7 +179,7 @@ case "$ACTION" in
 		sh -n "$TEMP" || exit $?
 
 		if cmp "$TEMP" "$DESTINATION"; then
-			log "[OK] no change"
+			log "[OK] no change detected"
 		else
 			log "[OK] sudo: download + install"
 			log "     from '$URL'"
@@ -242,7 +243,7 @@ prepare_usrlocalbin()
 
 	if rootuser_allowed; then
 		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" '.sh' )' this line:"
-		log "       $USER ALL = (root) NOPASSWD: $ME"
+		log "       $USER ALL = (ALL) NOPASSWD: $ME"
 		log
 		log "[sudo] will execute: sudo $0 add_secrets '$dir'"
 		sudo "$0" add_secrets "$dir" || exit 1
@@ -252,7 +253,7 @@ prepare_usrlocalbin()
 		log "       e.g. SUDO=true $0 $ACTION $ARG2"
 		log
 		log "[HINT] for cronjobs add e.g. to '/etc/sudoers.d/$( basename "$0" '.sh' )' this line:"
-		log "       $USER ALL = (root) NOPASSWD: $ME"
+		log "       $USER ALL = (ALL) NOPASSWD: $ME"
 	fi
 
 	log

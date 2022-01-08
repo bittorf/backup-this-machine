@@ -187,7 +187,7 @@ case "$ACTION" in
 		if test "$FILE_AGE" -lt 86400; then
 			exit 0
 		else
-			test "$AUTOUPDATE" = true && update
+			test "$AUTOUPDATE" = true && sudo "$0" update_with_sudo
 			ACTION='restic'
 		fi
 	;;

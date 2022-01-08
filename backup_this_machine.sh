@@ -163,7 +163,7 @@ update()
 	tail -n1 "$TEMP" | grep -q '}' || exit $?
 	sh -n "$TEMP" || exit $?
 
-	if cmp "$TEMP" "$DESTINATION"; then
+	if cmp "$TEMP" "$DESTINATION" >/dev/null; then
 		log "[OK] no change detected"
 	else
 		log "[OK] sudo: download + install"

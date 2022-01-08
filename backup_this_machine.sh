@@ -102,6 +102,9 @@ check_essentials()
 #
 #SUDO=true
 
+# uncomment for automatic updates in cronmode
+#AUTOUPDATE=true
+
 # values are in [kilobits/sec]
 #FLAGS="--limit-upload 200 --limit-download 3000"
 
@@ -139,6 +142,34 @@ EOF
 	}
 }
 
+update()
+{
+	BASE='https://raw.githubusercontent.com/bittorf'
+	URL="$BASE/backup-this-machine/main/backup_this_machine.sh"
+	DESTINATION="$ME"
+	TEMP="$( mktemp )" || exit 1
+
+	log "[OK] checking '$URL'"
+	wget -qO "$TEMP" "$URL" || exit $?
+
+	# some plausibility checks:
+	tail -n1 "$TEMP" | grep -q '}' || exit $?
+	sh -n "$TEMP" || exit $?
+
+	if cmp "$TEMP" "$DESTINATION"; then
+		log "[OK] no change detected"
+	else
+		log "[OK] sudo: download + install"
+		log "     from '$URL'"
+		log "     to '$DESTINATION'"
+
+		sudo cp  "$TEMP" "$DESTINATION" || exit $?
+		sudo chmod +x    "$DESTINATION" && log "[OK] updated"
+	fi
+
+	rm -f "$TEMP"
+}
+
 case "$ACTION" in
 	restic-cronmode)
 		UNIXTIME="$( date +%s )"
@@ -148,6 +179,7 @@ case "$ACTION" in
 		if test "$FILE_AGE" -lt 86400; then
 			exit 0
 		else
+			test "$AUTOUPDATE" = true && update
 			ACTION='restic'
 		fi
 	;;
@@ -166,30 +198,7 @@ case "$ACTION" in
 	add_secrets)
 	;;
 	update)
-		BASE='https://raw.githubusercontent.com/bittorf'
-		URL="$BASE/backup-this-machine/main/backup_this_machine.sh"
-		DESTINATION="$ME"
-		TEMP="$( mktemp )" || exit 1
-
-		log "[OK] checking '$URL'"
-		wget -qO "$TEMP" "$URL" || exit $?
-
-		# some plausibility checks:
-		tail -n1 "$TEMP" | grep -q '}' || exit $?
-		sh -n "$TEMP" || exit $?
-
-		if cmp "$TEMP" "$DESTINATION"; then
-			log "[OK] no change detected"
-		else
-			log "[OK] sudo: download + install"
-			log "     from '$URL'"
-			log "     to '$DESTINATION'"
-
-			sudo cp  "$TEMP" "$DESTINATION" || exit $?
-			sudo chmod +x    "$DESTINATION" && log "[OK] updated"
-		fi
-
-		rm -f "$TEMP"
+		update
 		exit 0
 	;;
 	*)

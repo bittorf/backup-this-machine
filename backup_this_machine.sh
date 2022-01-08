@@ -83,9 +83,12 @@ check_essentials()
 		cat >>"$CONFIG" <<EOF
 #!/bin/sh
 #
-# this config file belongs to $0
-# uncomment these vars:
-
+# this config file belongs to '$0'
+# the filedate is used for marking the last good update in cronmode
+# unmark to schedule the next backup with:
+# touch -t 202011111200 '$CONFIG'
+#
+# uncomment and set these vars:
 #DESTINATION="/tank/bastian/privat/backup/\${COMPUTERNAME}-restic-repo"
 # setup autologin with this command: ssh-copy-id -p 443 user@hostname
 #SERVER="sftp://bastian@bwireless.mooo.com:443"

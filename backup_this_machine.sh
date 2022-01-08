@@ -71,6 +71,8 @@ configured vars (defaults or from file '$CONFIG'):
  # DESTINATION	=> $DESTINATION
  # SERVER	=> $SERVER
  # PASS		=> $PASS
+ # SUDO         => ${SUDO:-<unset>}
+ # AUTOUPDATE   => ${AUTOUPDATE:-<unset>}
 
 EOF
 }

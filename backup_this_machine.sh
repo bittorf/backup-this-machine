@@ -171,8 +171,9 @@ update()
 		log "     from '$URL'"
 		log "     to '$DESTINATION'"
 
-		cp  "$TEMP" "$DESTINATION" || exit $?
-		chmod +x    "$DESTINATION" && log "[OK] updated to new version"
+		cp  "$TEMP" "$DESTINATION" && {
+			chmod +x "$DESTINATION" && log "[OK] updated to new version"
+		}
 	fi
 
 	rm -f "$TEMP"

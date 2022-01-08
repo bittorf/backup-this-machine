@@ -73,7 +73,7 @@ configured vars (defaults or configfile '$CONFIG'):
  # FLAGS        => ${FLAGS:-*** <empty> ***}
  # DESTINATION	=> $DESTINATION
  # SERVER	=> $SERVER
- # PASS		=> $PASS
+ # PASS		=> $( case "${#PASS}" in 0) printf '%s' '*** <empty> ***' ;; *) printf '%s' '(password is set)' ;; esac )
  # SUDO         => ${SUDO:-<unset>}
  # AUTOUPDATE   => ${AUTOUPDATE:-<unset>}
 

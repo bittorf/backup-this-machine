@@ -62,7 +62,7 @@ Usage: $me <full|restic|restic-and-suspend|restic-cronmode|restic-snapshots-list
   see: https://github.com/bittorf/backup-this-machine
 
 script-date: $( date -r "$ME" )
-config-date: $( date -r "$CONFIG" && echo ' (last successful backup)' )
+config-date: $( date -r "$CONFIG" && printf '%s' ' (last successful backup)' )
 
 configured vars (defaults or from file '$CONFIG'):
  # USERNAME	=> $USERNAME
@@ -172,7 +172,7 @@ update()
 		log "     to '$DESTINATION'"
 
 		sudo cp  "$TEMP" "$DESTINATION" || exit $?
-		sudo chmod +x    "$DESTINATION" && log "[OK] updated"
+		sudo chmod +x    "$DESTINATION" && log "[OK] updated to new version"
 	fi
 
 	rm -f "$TEMP"

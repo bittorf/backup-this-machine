@@ -114,8 +114,8 @@ check_essentials()
 # uncomment for automatic updates in cronmode
 #AUTOUPDATE=true
 
-# values are in [kibibytes/sec], e.g. 1000 KiB/s ~ 1mbit/s
-#FLAGS="--limit-upload 200 --limit-download 3000"
+# values are in [kibibytes/sec], e.g. 220 KiB/s ~ 1.76 megabits/s
+#FLAGS="--limit-upload 220 --limit-download 1500"
 
 EOF
 		return 1

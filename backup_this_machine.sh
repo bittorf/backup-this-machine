@@ -95,6 +95,7 @@ check_essentials()
 #
 # uncomment and set these vars:
 #DESTINATION="/tank/bastian/privat/backup/\${COMPUTERNAME}-restic-repo"
+# generate ssh-identity with: test -e ~/.ssh/id_rsa.pub || ssh-keygen -t rsa -b 2048
 # setup autologin with this command: ssh-copy-id -p 443 user@hostname
 #SERVER="sftp://bastian@bwireless.mooo.com:443"
 #PASS='a secret password'

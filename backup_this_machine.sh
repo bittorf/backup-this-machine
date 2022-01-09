@@ -62,7 +62,7 @@ Usage: $me restic
   see: https://github.com/bittorf/backup-this-machine
 
 script-date: $( date -r "$ME" )
-config-date: $( date -r "$CONFIG" ) (last successful backup)
+config-date: $( date -r "$CONFIG" 2>/dev/null || printf '%s' '*** n/a ***' ) (last successful backup)
 
 configured vars (defaults or configfile '$CONFIG'):
  # USERNAME	=> $USERNAME
@@ -105,10 +105,10 @@ check_essentials()
 #EXCLUDE="\$EXCLUDE \$HOME/ssd \$HOME/.steam \$HOME/kannweg \$HOME/Downloads"
 
 # uncomment this for storing ssh-keys, passwords and network-configs
-# for cronjobs add next line to '/etc/sudoers.d/$( basename "$0" '.sh' )'"
-#    $USER ALL = (ALL) NOPASSWD: $ME"
-#
 #SUDO=true
+
+# for cronjobs add next line to '/etc/sudoers.d/$( basename "$0" '.sh' )'
+#    $USER ALL = (ALL) NOPASSWD: $ME"
 
 # uncomment for automatic updates in cronmode
 #AUTOUPDATE=true

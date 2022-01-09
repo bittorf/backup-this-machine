@@ -24,8 +24,8 @@ COMPUTERNAME="$USERNAME-$( hostname || cat /etc/hostname )"	# e.g. bob-laptop
 HOME="$( eval echo ~"$USERNAME" )"
 ME="$( realpath "$0" || echo "$0" )"
 
-# avoid double username:
-case "$COMPUTERNAME" in "$USERNAME-$USERNAME-"*) COMPUTERNAME="${COMPUTERNAME#*-}" ;; esac
+# avoid double username, e.g. peter at host peter => peter
+case "$COMPUTERNAME" in "$USERNAME-$USERNAME"*) COMPUTERNAME="${COMPUTERNAME#*-}" ;; esac
 
 # also for overriding any of the vars above:
 CONFIG="$HOME/.backup_this_machine.config"
@@ -109,12 +109,12 @@ check_essentials()
 #SUDO=true
 
 # for cronjobs add next line to '/etc/sudoers.d/$( basename "$0" '.sh' )'
-#    $USER ALL = (ALL) NOPASSWD: $ME"
+#    $USER ALL = (ALL) NOPASSWD: $ME
 
 # uncomment for automatic updates in cronmode
 #AUTOUPDATE=true
 
-# values are in [kilobits/sec]
+# values are in [kibibytes/sec], e.g. 1000 KiB/s ~ 1mbit/s
 #FLAGS="--limit-upload 200 --limit-download 3000"
 
 EOF

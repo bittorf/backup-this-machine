@@ -146,7 +146,12 @@ EOF
 	}
 
 	command -v 'restic' >/dev/null || {
-		echo "please install restic, see: https://restic.net/"
+		echo "please install 'restic', see: https://restic.net/"
+		return 1
+	}
+
+	command -v 'nice' >/dev/null || {
+		echo "please install 'nice'"
 		return 1
 	}
 }
@@ -360,7 +365,7 @@ case "$ACTION" in
 		prepare_usrlocalbin "$HOME/usr-local-bin"
 
 		# shellcheck disable=SC2086
-		if RESTIC_PASSWORD=$PASS restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
+		if RESTIC_PASSWORD=$PASS nice -n1 restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
 			touch "$CONFIG"		# mark as 'done' using file timestamp
 		else
 			RC=$?

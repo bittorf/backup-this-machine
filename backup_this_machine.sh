@@ -29,11 +29,16 @@ case "$COMPUTERNAME" in "$USERNAME-$USERNAME"*) COMPUTERNAME="${COMPUTERNAME#*-}
 
 # also for overriding any of the vars above:
 CONFIG="$HOME/.backup_this_machine.config"
+LOGFILE="$CONFIG.log.txt"
 LOCKDIR="$CONFIG.lock"
 
 log()
 {
-	>&2 printf '%s\n' "$1"
+	local txt="$1"
+	local option="$2"
+
+	>&2 printf '%s\n' "$txt"
+	case "$option" in 'tofile') printf '%s\n' "$( date ) | $txt" >>"$LOGFILE" ;; esac
 }
 
 lock()
@@ -364,13 +369,15 @@ case "$ACTION" in
 
 		prepare_usrlocalbin "$HOME/usr-local-bin"
 
+		log "starting restic" tofile
 		# shellcheck disable=SC2086
 		if RESTIC_PASSWORD=$PASS nice -n1 restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
 			touch "$CONFIG"		# mark as 'done' using file timestamp
+			log "restic OK" tofile
 		else
 			RC=$?
 			log
-			log "[ERROR] restic exited with rc $RC"
+			log "[ERROR] restic exited with rc $RC" tofile
 			log "        maybe this is your first time and you must initialize your repository like:"
 			log "        RESTIC_PASSWORD=$PASS restic -r \"$REPO\" init"
 		fi

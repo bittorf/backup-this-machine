@@ -21,7 +21,7 @@ esac
 
 USERNAME="$( whoami )"
 COMPUTERNAME="$USERNAME-$( hostname || cat /etc/hostname )"	# e.g. bob-laptop
-HOME="$( eval echo ~"$USERNAME" )"
+eval HOME="~$USERNAME"
 ME="$( realpath "$0" || echo "$0" )"
 
 # avoid double username, e.g. peter at host peter => peter

@@ -371,7 +371,7 @@ case "$ACTION" in
 
 		log "starting restic" tofile
 		# shellcheck disable=SC2086
-		if RESTIC_PASSWORD=$PASS nice -n1 restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
+		if RESTIC_PASSWORD=$PASS nice -n 5 restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
 			touch "$CONFIG"		# mark as 'done' using file timestamp
 			log "restic OK" tofile
 		else

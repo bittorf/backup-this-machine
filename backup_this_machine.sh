@@ -201,6 +201,7 @@ case "$ACTION" in
 		else
 			test "$AUTOUPDATE" = true && sudo "$0" update_with_sudo
 			ACTION='restic'
+			NICEPRIO=5
 		fi
 	;;
 	restic-restore)
@@ -371,7 +372,7 @@ case "$ACTION" in
 
 		log "starting restic" tofile
 		# shellcheck disable=SC2086
-		if RESTIC_PASSWORD=$PASS nice -n 5 restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
+		if RESTIC_PASSWORD=$PASS nice -n ${NICEPRIO:-0} restic -r "$REPO" $OPT --verbose backup $FLAGS "$HOME"; then
 			touch "$CONFIG"		# mark as 'done' using file timestamp
 			log "restic OK" tofile
 		else

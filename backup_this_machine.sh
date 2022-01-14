@@ -19,7 +19,7 @@ case "$ACTION" in
 	;;
 esac
 
-USERNAME="$( whoami )"
+USERNAME="$( id -u -n )"
 COMPUTERNAME="$USERNAME-$( hostname || cat /etc/hostname )"	# e.g. bob-laptop
 eval HOME="~$USERNAME"
 ME="$( realpath "$0" || echo "$0" )"

@@ -196,7 +196,7 @@ case "$ACTION" in
 		UNIXFILE="$( date +%s -r "$CONFIG" )"	# touched after successful backup
 		FILE_AGE=$(( UNIXTIME - UNIXFILE ))
 
-		if test "$FILE_AGE" -lt 86400; then
+		if test "$FILE_AGE" -lt $(( 6 * 86400 )); then
 			exit 0
 		else
 			test "$AUTOUPDATE" = true && sudo "$0" update_with_sudo

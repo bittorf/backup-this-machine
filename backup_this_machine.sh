@@ -264,7 +264,7 @@ prepare_usrlocalbin()
 		# shellcheck disable=SC2064
 		trap "cleanup '$dir'" HUP INT QUIT TERM EXIT
 	else
-		log "[ABORT] directory already exists: '$dir'"
+		log "[ABORT] lockdir '$LOCKDIR' or directory already exists: '$dir'"
 		exit 1
 	fi
 

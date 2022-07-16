@@ -190,11 +190,21 @@ update()
 	rm -f "$TEMP"
 }
 
+file_age_seconds()
+{
+	local file="$1"		# or directory
+	local unix_now unix_file diff
+
+	unix_now="$(  date +%s )"
+	unix_file="$( date +%s -r "$file" )"
+	diff=$(( unix_now - unix_file ))
+
+	printf '%s\n' "$diff"
+}
+
 case "$ACTION" in
 	restic-cronmode)
-		UNIXTIME="$( date +%s )"
-		UNIXFILE="$( date +%s -r "$CONFIG" )"	# touched after successful backup
-		FILE_AGE=$(( UNIXTIME - UNIXFILE ))
+		FILE_AGE="$( file_age_seconds "$CONFIG" )"	# touched after successful backup
 
 		if test "$FILE_AGE" -lt $(( 6 * 86400 )); then
 			exit 0

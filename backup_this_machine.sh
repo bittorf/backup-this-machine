@@ -214,10 +214,12 @@ case "$ACTION" in
 	restic-cronmode)
 	;;
 	*)
-		# shellcheck disable=SC1090
-		test -s "$CONFIG" && log "[OK] loading settings from '$CONFIG'" && . "$CONFIG"
+		log "[OK] loading settings from '$CONFIG'"
 	;;
 esac
+
+# shellcheck disable=SC1090
+test -s "$CONFIG" && . "$CONFIG"
 
 case "$ACTION" in
 	restic-cronmode)

@@ -57,9 +57,6 @@ lock()
 	}
 }
 
-# shellcheck disable=SC1090
-test -s "$CONFIG" && log "[OK] loading settings from '$CONFIG'" && . "$CONFIG"
-
 usage_show()
 {
 	local me && me="$( basename "$ME" )"
@@ -212,6 +209,15 @@ file_age_seconds()
 
 	printf '%s\n' "$diff"
 }
+
+case "$ACTION" in
+	restic-cronmode)
+	;;
+	*)
+		# shellcheck disable=SC1090
+		test -s "$CONFIG" && log "[OK] loading settings from '$CONFIG'" && . "$CONFIG"
+	;;
+esac
 
 case "$ACTION" in
 	restic-cronmode)

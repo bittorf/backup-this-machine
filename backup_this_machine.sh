@@ -16,6 +16,7 @@ case "$ACTION" in
 		CPU=1; for _ in /sys/devices/system/cpu/cpu[0-9]*; do CPU=$(( CPU + 1 )); done
 		read -r LOAD REST </proc/loadavg && LOAD=${LOAD%.*}
 		test "$LOAD" -le $(( CPU / 2 )) || exit 0
+		export GOMAXPROCS=1	# TODO: LOAD e.g. 4 and CPU=8 -> use 3 CPU's
 	;;
 esac
 

@@ -46,7 +46,7 @@ lock()
 	mkdir "$LOCKDIR" 2>/dev/null || {
 		if test "$( file_age_seconds "$LOCKDIR" )" -gt $(( 2 * 86400 )); then
 			log "[OK] autoremoving old lockdir '$LOCKDIR*"
-			rm -fR "$LOCKDIR"
+			rm -fR "$LOCKDIR" && mkdir "$LOCKDIR"
 		else
 			return 1	# autounlocked in cleanup()
 		fi

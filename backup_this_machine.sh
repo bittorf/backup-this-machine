@@ -279,7 +279,7 @@ prepare_usrlocalbin()
 
 	log "[OK] creating and filling directory '$dir'"
 
-	if lock && mkdir "$dir"; then
+	if lock "$LOCKDIR" && lock "$dir"; then
 		# shellcheck disable=SC2064
 		trap "cleanup '$dir'" HUP INT QUIT TERM EXIT
 	else
@@ -287,9 +287,8 @@ prepare_usrlocalbin()
 		exit 1
 	fi
 
-	cp -p -R /usr/local/bin/                   "$dir"
-
-	[ -f /etc/rc.local ] && cat /etc/rc.local >"$dir/etc-rc.local"
+	cp -p -R /usr/local/bin/                    "$dir"
+	test -f /etc/rc.local && cat /etc/rc.local >"$dir/etc-rc.local"
 
 	crontab -l 2>/dev/null >/dev/null && \
 		crontab -l >"$dir/crontab.txt"

@@ -43,7 +43,7 @@ log()
 
 lock()
 {
-	dir="${1:-$LOCKDIR}"
+	local dir="${1:-$LOCKDIR}"
 
 	mkdir "$dir" 2>/dev/null || {
 		if test "$( file_age_seconds "$dir" )" -gt $(( 2 * 86400 )); then

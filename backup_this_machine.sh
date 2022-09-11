@@ -43,12 +43,14 @@ log()
 
 lock()
 {
-	mkdir "$LOCKDIR" 2>/dev/null || {
-		if test "$( file_age_seconds "$LOCKDIR" )" -gt $(( 2 * 86400 )); then
-			log "[OK] autoremoving old lockdir '$LOCKDIR*"
-			rm -fR "$LOCKDIR" && mkdir "$LOCKDIR"
+	dir="${1:-$LOCKDIR}"
+
+	mkdir "$dir" 2>/dev/null || {
+		if test "$( file_age_seconds "$dir" )" -gt $(( 2 * 86400 )); then
+			log "[OK] autoremoving old lockdir '$dir*"
+			rm -fR "$dir" && mkdir "$dir"
 		else
-			return 1	# autounlocked in cleanup()
+			return 1	# is autounlocked in cleanup()
 		fi
 	}
 }
@@ -281,7 +283,7 @@ prepare_usrlocalbin()
 		# shellcheck disable=SC2064
 		trap "cleanup '$dir'" HUP INT QUIT TERM EXIT
 	else
-		log "[ABORT] lockdir '$LOCKDIR' or directory already exists: '$dir'"
+		log "[ABORT] lockdir '$LOCKDIR' or directory '$dir' already exists"
 		exit 1
 	fi
 

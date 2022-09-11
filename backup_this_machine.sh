@@ -50,6 +50,7 @@ lock()
 			log "[OK] autoremoving old lockdir '$dir*"
 			rm -fR "$dir" && mkdir "$dir"
 		else
+			log "[ERROR] dir '$dir' already exists"
 			return 1	# is autounlocked in cleanup()
 		fi
 	}
@@ -283,7 +284,7 @@ prepare_usrlocalbin()
 		# shellcheck disable=SC2064
 		trap "cleanup '$dir'" HUP INT QUIT TERM EXIT
 	else
-		log "[ABORT] lockdir '$LOCKDIR' or directory '$dir' already exists"
+		log "[ABORT] can not unlock, dir already exists"
 		exit 1
 	fi
 

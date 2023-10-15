@@ -44,18 +44,18 @@ log()
 
 lock()
 {
-	local dir="${1:-$LOCKDIR}"
-
-	mkdir "$dir" 2>/dev/null || {
-		if test "$( file_age_seconds "$dir" )" -gt $(( 2 * 86400 )); then
-			log "[OK] autoremoving old lockdir '$dir*"
-			rm -fR "$dir" && mkdir "$dir"
+	mkdir "$LOCKDIR" 2>/dev/null || {
+		if test "$( file_age_seconds "$LOCKDIR" )" -gt $(( 2 * 86400 )); then
+			log "[OK] autoremoving old lockdir '$LOCKDIR*"
+			rm -fR "$LOCKDIR"
 		else
-			log "[ERROR] dir '$dir' already exists"
-			return 1	# is autounlocked in cleanup()
+			return 1	# autounlocked in cleanup()
 		fi
 	}
 }
+
+# shellcheck disable=SC1090
+test -s "$CONFIG" && log "[OK] loading settings from '$CONFIG'" && . "$CONFIG"
 
 usage_show()
 {
@@ -71,6 +71,7 @@ Usage: $me restic
        $me restic-restore
        $me full
        $me update
+       $me serverinfo
 
   see: https://github.com/bittorf/backup-this-machine
 
@@ -210,16 +211,44 @@ file_age_seconds()
 	printf '%s\n' "$diff"
 }
 
-case "$ACTION" in
-	restic-cronmode)
-	;;
-	*)
-		log "[OK] loading settings from '$CONFIG'"
-	;;
-esac
+serverinfo_get()
+{
+	local ssh_user="$1"
+	local ssh_host="$2"
+	local port="$3"
 
-# shellcheck disable=SC1090
-test -s "$CONFIG" && . "$CONFIG"
+	local ssh="ssh -n $ssh_user@$ssh_host -p ${port:-22}"
+	local maindir pattern command line base dir newest_file unix date size
+
+	maindir="$( dirname  "$DESTINATION" )"	# /tank/bastian/privat/backup/bastian-ryzen-restic-repo => /tank/bastian/privat/backup
+	pattern="$( basename "$DESTINATION" )"	# /tank/bastian/privat/backup/bastian-ryzen-restic-repo => bastian-ryzen-restic-repo
+	pattern="$( echo "$pattern" | sed "s/^$COMPUTERNAME//" )"	# bastian-ryzen-restic-repo => -restic-repo
+
+	command="find '$maindir' -maxdepth 1 -type d -name '*$pattern*'"
+
+	echo "# directories in '$maindir' with pattern '$pattern'"
+	echo "# command: $command"
+	echo "# $ssh"
+	echo
+
+	$ssh "$command" | while read -r line; do {
+		# e.g.: /tank/bastian/privat/backup/bastian-ryzen-restic-repo
+		base="$( basename "$line" | sed "s/$pattern//" )"
+		dir="$line/snapshots"
+		log "working on '$dir'"
+
+		$ssh "test -d '$dir'" && {
+			newest_file="$( $ssh "find '$dir' -type f -printf '%T@|%p\n' | sort -n | tail -n1 | cut -d'|' -f2" )"
+			unix="$( $ssh "date +%s -r '$newest_file'" )"
+			date="$( $ssh "date -d '@$unix'" )"
+
+			for size in $( $ssh "du -sh '$line'" ); do break; done
+			size="$( printf '%5s\n' "$size" )"
+
+			echo "$unix | $date | $size | $base"
+		}
+	} done | sort -rn
+}
 
 case "$ACTION" in
 	restic-cronmode)
@@ -235,7 +264,7 @@ case "$ACTION" in
 	;;
 	restic-restore)
 	;;
-	full|restic|restic-and-suspend|restic-snapshots-list|restic-mount)
+	full|restic|restic-and-suspend|restic-snapshots-list|restic-mount|serverinfo)
 		check_essentials || exit 1
 	;;
 	help)
@@ -289,16 +318,17 @@ prepare_usrlocalbin()
 
 	log "[OK] creating and filling directory '$dir'"
 
-	if lock "$LOCKDIR" && lock "$dir"; then
+	if lock && mkdir "$dir"; then
 		# shellcheck disable=SC2064
 		trap "cleanup '$dir'" HUP INT QUIT TERM EXIT
 	else
-		log "[ABORT] can not unlock, dir already exists"
+		log "[ABORT] lockdir '$LOCKDIR' or directory already exists: '$dir'"
 		exit 1
 	fi
 
-	cp -p -R /usr/local/bin/                    "$dir"
-	test -f /etc/rc.local && cat /etc/rc.local >"$dir/etc-rc.local"
+	cp -p -R /usr/local/bin/                   "$dir"
+
+	[ -f /etc/rc.local ] && cat /etc/rc.local >"$dir/etc-rc.local"
 
 	crontab -l 2>/dev/null >/dev/null && \
 		crontab -l >"$dir/crontab.txt"
@@ -368,7 +398,7 @@ case "$ACTION" in
 		chown -R "$USER_AND_GROUP" "$DIR"
 		exit 0
 	;;
-	'restic'|'restic-and-suspend'|'restic-snapshots-list'|'restic-mount'|'restic-restore')
+	'restic'|'restic-and-suspend'|'restic-snapshots-list'|'restic-mount'|'restic-restore'|'serverinfo')
 		REPO="$SERVER:$DESTINATION"	# oldstyle?
 		REPO="$SERVER/$DESTINATION"
 
@@ -392,6 +422,16 @@ case "$ACTION" in
 				# TODO: crontab + ssh + password
 				# shellcheck disable=SC2086
 				RESTIC_PASSWORD=$PASS restic -r "$REPO" restore latest --target /
+				exit $?
+			;;
+			'serverinfo')
+				# e.g. sftp://bastian@bwireless.mooo.com:443
+				USER_AT_HOST="$( echo "$SERVER" | cut -d'/' -f3 | cut -d':' -f1 )"
+
+				serverinfo_get \
+					"${USER_AT_HOST%@*}" \
+					"${USER_AT_HOST#*@}" \
+					"${SERVER##*:}"
 				exit $?
 			;;
 		esac

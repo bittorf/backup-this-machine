@@ -42,3 +42,6 @@ $ backup_this_machine.sh restic-restore
 ```
 $ backup_this_machine.sh restic-mount
 ```
+### ToDo:
+* detect "on mobile dataplan" in cronmode and stop working
+

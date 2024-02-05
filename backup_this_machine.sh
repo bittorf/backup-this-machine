@@ -245,7 +245,7 @@ serverinfo_get()
 			for size in $( $ssh "du -sh '$line'" ); do break; done
 			size="$( printf '%5s\n' "$size" )"
 
-			echo "$unix | $date | $size | $base"
+			printf '%8s | %32s | %5s | %s\n' "$unix" "$date" "$size" "$base"
 		}
 	} done | sort -rn
 }

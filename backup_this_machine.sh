@@ -239,7 +239,7 @@ serverinfo_get()
 
 		$ssh "test -d '$dir'" && {
 			newest_file="$( $ssh "find '$dir' -type f -printf '%T@|%p\n' | sort -n | tail -n1 | cut -d'|' -f2" )"
-			unix="$( $ssh "date +%s -r '$newest_file'" )"
+			unix="$( $ssh "date +%s -r '${newest_file:-$dir}'" )"
 			date="$( $ssh "date -d '@$unix'" )"
 
 			for size in $( $ssh "du -sh '$line'" ); do break; done

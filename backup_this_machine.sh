@@ -1,5 +1,5 @@
 #!/bin/sh
-# check: shellcheck --shell=dash backup_this_machine.sh
+# shellcheck shell=dash
 #
 # e.g. run rootjob with
 # list_users() { grep "/bin/bash"$ /etc/passwd | cut -d':' -f1; }
@@ -316,7 +316,10 @@ prepare_usrlocalbin()
 {
 	local dir="$1"
 
-	log "[OK] creating and filling directory '$dir'"
+	case "$( uname -a )" in
+		MINGW64*) log "[OK] windows detected - omiting usrlocalbin" && return 0 ;;
+		*) log "[OK] creating and filling directory '$dir'" ;;
+	esac
 
 	if lock && mkdir "$dir"; then
 		# shellcheck disable=SC2064
@@ -452,7 +455,7 @@ case "$ACTION" in
 		fi
 
 		[ "$ACTION" = 'restic-and-suspend' ] && do_suspend
-		exit ${RC:-0}
+		exit "${RC:-0}"
 	;;
 esac
 

@@ -178,7 +178,11 @@ update()
 	TEMP="$( mktemp )" || exit 1
 
 	log "[OK] checking '$URL'"
-	wget -qO "$TEMP" "$URL" || exit $?
+	if command -v 'curl' >/dev/null; then
+		curl --silent --output "$TEMP" "$URL" || exit $?
+	else
+		wget -qO "$TEMP" "$URL" || exit $?
+	fi
 
 	# some plausibility checks:
 	tail -n1 "$TEMP" | grep -q '}' || exit $?

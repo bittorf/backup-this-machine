@@ -281,7 +281,12 @@ case "$ACTION" in
 		exit $?
 	;;
 	update)
-		sudo "$0" update_with_sudo
+		if command -v 'sudo' >/dev/null; then
+			sudo "$0" update_with_sudo
+		else
+			update
+		fi
+
 		exit $?
 	;;
 	*)

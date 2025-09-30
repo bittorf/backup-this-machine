@@ -379,7 +379,7 @@ do_suspend()	# https://askubuntu.com/questions/1792/how-can-i-suspend-hibernate-
 			 "org.freedesktop.UPower.Suspend"
 }
 
-OPT="$( for DIR in $EXCLUDE $HOME/.cache; do printf '%s ' "--exclude $DIR"; done ) --exclude-caches"
+OPT="$( for DIR in $EXCLUDE $HOME/.cache; do X=--exclude-file && test -d "$DIR" && X=--exclude; printf '%s ' "$X $DIR"; done ) --exclude-caches"
 
 case "$ACTION" in
 	'full')

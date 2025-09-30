@@ -285,7 +285,11 @@ case "$ACTION" in
 		exit $?
 	;;
 	update)
-		if command -v 'sudo' >/dev/null; then
+		if [ "$OSTYPE" = msys ]; then
+			update
+		elif [ -f ~/NTUSER.DAT ]; then
+			update
+		elif command -v 'sudo' >/dev/null; then
 			sudo "$0" update_with_sudo
 		else
 			update
